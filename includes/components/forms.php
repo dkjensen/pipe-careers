@@ -100,3 +100,33 @@ function pipecareers_forms_seo_robots_meta( $meta ) {
 	return $meta;
 }
 add_filter( 'the_seo_framework_robots_meta_array', 'pipecareers_forms_seo_robots_meta');
+
+/**
+ * Use default beaver builder + astra template
+ *
+ * @param mixed $metadata
+ * @param integer $object_id
+ * @param string $meta_key
+ * @param boolean $single
+ * @return mixed
+ */
+function pipecareers_forms_load_bb( $metadata, $object_id, $meta_key, $single ) {
+    if ( get_query_var( 'forms' ) ) {
+        if ( isset( $meta_key ) ) {
+            if ( substr( $meta_key, 0, 4 ) == '_fl_' ) {
+                $metadata = '';
+            } else if ( substr( $meta_key, 0, 5 ) == 'site-' ) {
+                $metadata = 'default';
+            } else {
+                return $metadata;
+            }
+        }
+
+        if ( ! $single ) {
+            return [ $metadata ];
+        }
+    }
+
+    return $metadata;
+}
+add_filter( 'get_post_metadata', 'pipecareers_forms_load_bb', 10, 4 );
