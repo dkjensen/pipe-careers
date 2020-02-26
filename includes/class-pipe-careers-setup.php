@@ -31,6 +31,36 @@ class Pipe_Careers_Setup {
      * @return void
      */
     function post_types() {
+        register_post_type( 'help-article', array(
+            'labels'             => array(
+                'name'               => _x( 'Help Articles', 'post type general name', 'pipe-careers' ),
+                'singular_name'      => _x( 'Help Article', 'post type singular name', 'pipe-careers' ),
+                'menu_name'          => _x( 'Help Articles', 'admin menu', 'pipe-careers' ),
+                'name_admin_bar'     => _x( 'Help Article', 'add new on admin bar', 'pipe-careers' ),
+                'add_new'            => _x( 'Add New', 'help article', 'pipe-careers' ),
+                'add_new_item'       => __( 'Add New Help Article', 'pipe-careers' ),
+                'new_item'           => __( 'New Help Article', 'pipe-careers' ),
+                'edit_item'          => __( 'Edit Help Article', 'pipe-careers' ),
+                'view_item'          => __( 'View Help Article', 'pipe-careers' ),
+                'all_items'          => __( 'All Help Articles', 'pipe-careers' ),
+                'search_items'       => __( 'Search Help Articles', 'pipe-careers' ),
+                'parent_item_colon'  => __( 'Parent Help Articles:', 'pipe-careers' ),
+                'not_found'          => __( 'No help articles found.', 'pipe-careers' ),
+                'not_found_in_trash' => __( 'No help articles found in Trash.', 'pipe-careers' )
+            ),
+            'public'             => true,
+            'publicly_queryable' => true,
+            'show_ui'            => true,
+            'show_in_menu'       => true,
+            'query_var'          => true,
+            'capability_type'    => 'post',
+            'has_archive'        => 'help',
+            'menu_position'      => null,
+            'menu_icon'          => 'dashicons-sos',
+            'rewrite'            => array( 'slug' => 'help' ),
+            'supports'           => array( 'title', 'editor', 'thumbnail' )
+        ) );
+
         register_post_type( 'landingpage', array(
             'labels'             => array(
                 'name'               => _x( 'Landing Pages', 'post type general name', 'pipe-careers' ),
@@ -57,12 +87,12 @@ class Pipe_Careers_Setup {
             'has_archive'        => 'explore',
             'menu_position'      => null,
             'menu_icon'          => 'dashicons-clipboard',
-            'rewrite'            => array(
-                'with_front'     => false,
-                'slug'           => '%state%'
-            ),
+            'rewrite'            => false,
             'supports'           => array( 'title', 'editor', 'thumbnail' )
         ) );
+
+        add_rewrite_rule( '^explore(?:/([0-9]+))?/?$', 'index.php?post_type=landingpage&page=$matches[2]', 'top' );
+        add_rewrite_rule( '^([^/]+)/([^/]+)?$', 'index.php?state=$matches[1]&pagename=$matches[2]', 'bottom' );
 
 
         register_taxonomy( 'state', 'landingpage', array(
@@ -150,8 +180,11 @@ class Pipe_Careers_Setup {
         $states = get_terms( array( 'taxonomy' => 'state', 'hide_empty' => false ) );
 
         foreach ( $states as $state ) {
-            add_rewrite_rule( $state->slug . '/(.+?)/?$', 'index.php?taxonomy=state&term=' . $state->slug . '&landingpage=$matches[1]', 'top' );
+            add_rewrite_rule( $state->slug . '/([0-9]+?)/?$', 'index.php?taxonomy=state&term=' . $state->slug . '&landingpage=$matches[1]', 'top' );
+            add_rewrite_rule( $state->slug . '/([0-9]+?)/forms/?$', 'index.php?taxonomy=state&term=' . $state->slug . '&landingpage=$matches[1]', 'top' );
         }
+
+        register_taxonomy_for_object_type( 'post_tag', 'help-article' );
 
         register_taxonomy_for_object_type( 'state', 'landingpage' );
         register_taxonomy_for_object_type( 'trade', 'landingpage' );
@@ -163,6 +196,11 @@ class Pipe_Careers_Setup {
         if ( false !== strpos( $post_link, '%state%' ) ) {
             $state_type_term = get_the_terms( $post->ID, 'state' );
             $post_link = str_replace( '%state%', array_pop( $state_type_term )->slug, $post_link );
+        }
+
+        if ( get_post_type( $post->ID ) == 'landingpage' ) {
+            $state_type_term = get_the_terms( $post->ID, 'state' );
+            $post_link = home_url( array_pop( $state_type_term )->slug . '/' . $post->post_name );
         }
     
         return $post_link;
@@ -234,13 +272,17 @@ class Pipe_Careers_Setup {
         wp_register_script( 'slick', PIPE_CAREERS_PLUGIN_URL . 'assets/js/slick.min.js' );
         wp_register_style( 'slick', PIPE_CAREERS_PLUGIN_URL . 'assets/css/slick.min.css' );
 
+        // Leaflet
+        wp_register_script( 'leaflet', PIPE_CAREERS_PLUGIN_URL . 'assets/js/leaflet.min.js' );
+        wp_register_style( 'leaflet', PIPE_CAREERS_PLUGIN_URL . 'assets/css/leafet.min.css' );
+
         // Mapbox
         wp_register_script( 'mapbox', PIPE_CAREERS_PLUGIN_URL . 'assets/js/mapbox-gl.min.js' );
         wp_register_style( 'mapbox', PIPE_CAREERS_PLUGIN_URL . 'assets/css/mapbox-gl.min.css' );
 
         // This plugin
-        wp_register_script( 'pipe-careers', PIPE_CAREERS_PLUGIN_URL . 'assets/js/frontend.min.js', array( 'jquery', 'mapbox', 'slick' ), PIPE_CAREERS_VER, true );
-        wp_enqueue_style( 'pipe-careers', PIPE_CAREERS_PLUGIN_URL . 'assets/css/frontend.min.css', array( 'mapbox', 'slick' ), PIPE_CAREERS_VER );
+        wp_register_script( 'pipe-careers', PIPE_CAREERS_PLUGIN_URL . 'assets/js/frontend.min.js', array( 'jquery', 'leaflet', 'mapbox', 'slick' ), PIPE_CAREERS_VER, true );
+        wp_enqueue_style( 'pipe-careers', PIPE_CAREERS_PLUGIN_URL . 'assets/css/frontend.min.css', array( 'mapbox', 'leaflet', 'slick' ), PIPE_CAREERS_VER );
 
         wp_localize_script( 'pipe-careers', 'pipecareers', $this->script_data() );
 

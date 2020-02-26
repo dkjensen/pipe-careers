@@ -139,7 +139,7 @@ class Pipe_Careers_Search {
      */
     public function search_shortcode( $atts, $content = '' ) {
         $atts = shortcode_atts( array(
-            'action'    => get_post_type_archive_link( 'landingpage' )
+            'action'    => home_url( 'explore' )
         ), $atts );
     
         ob_start();
@@ -157,14 +157,15 @@ class Pipe_Careers_Search {
                             'show_option_none'  => __( 'Select State', 'pipe-careers' ),
                             'value_field'       => 'slug',
                             'orderby'			=> 'name',
+                            'selected'          => isset( $_GET['sel_state'] ) ? $_GET['sel_state'] : ''
                         ) ); ?>
                         <a class="button use-location" title="<?php _e( 'Use my location', 'pipe-careers' ); ?>" href="#" onclick="return false;"><span class="pcicon-gps"></span></a>
                     </div>
                 </div>
                 <div class="pipecareers-search-page" data-page="2" data-controls="false">
                     <label class="field-label"><?php _e( 'Are you experienced?', 'pipe-careers' ); ?></label>
-                    <label for="pro-0" class="radio-label"><input type="radio" name="pro" value="0" id="pro-0" /> <?php _e( 'No experience', 'pipe-careers' ); ?></label> 
-                    <label for="pro-1" class="radio-label"><input type="radio" name="pro" value="1" id="pro-1" /> <?php _e( 'I have experience', 'pipe-careers' ); ?></label>
+                    <label for="pro-0" class="radio-label"><input type="radio" name="pro" value="0" id="pro-0" /> <?php _e( 'Little or No Experience', 'pipe-careers' ); ?></label> 
+                    <label for="pro-1" class="radio-label"><input type="radio" name="pro" value="1" id="pro-1" /> <?php _e( 'A Lot of Experience', 'pipe-careers' ); ?></label>
                 </div>
                 <div class="pipecareers-search-page" data-page="3">
                     <?php wp_dropdown_categories( array(
@@ -180,6 +181,12 @@ class Pipe_Careers_Search {
                 </div>
             </form>
         </div>
+
+        <?php if ( isset( $_GET['sel_state'] ) ) : ?>
+
+            <script>setTimeout( function() { jQuery( 'select[name="state"]' ).trigger('change' ); }, 1000 );</script>
+
+        <?php endif; ?>
     
         <?php
         return ob_get_clean();

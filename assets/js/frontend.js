@@ -124,7 +124,41 @@
                         return memo;
                     }, [ 'in', 'FIPS' ] );
                 } );
-            
+
+                // Create a popup, but don't add it to the map yet.
+                var popup = new mapboxgl.Popup( {
+                    closeButton: false,
+                    closeOnClick: false
+                } );
+                
+                map.on( 'mousemove', 'counties', function( e ) {
+                    var description = '';
+
+                    for ( var property in pipecareers.locals ) {
+                        if ( pipecareers.locals.hasOwnProperty( property ) ) {
+                            if ( pipecareers.locals[property].fips.length ) {
+                                if ( ( typeof pipecareers.locals[property].fips === 'object' && pipecareers.locals[property].fips.indexOf( e.features[0].properties.FIPS ) !== -1 ) || pipecareers.locals[property].fips == e.features[0].properties.FIPS ) {
+                                    if ( typeof pipecareers.locals[property].title === 'string' && pipecareers.locals[property].title.length ) {
+                                        description = pipecareers.locals[property].title;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    popup.remove();
+
+                    if ( description ) {
+                        var coordinates = e.features[0].geometry.coordinates.slice();
+                        var polygon = new L.Polygon( coordinates );
+                        var center = polygon.getBounds().getCenter();
+
+                        popup.setLngLat( [ center.lat, center.lng ] )
+                            .setHTML( '<span style="color: #000;">' + description + '</span>' )
+                            .addTo( map );    
+                    }
+                } );
+
                 map.getCanvas().style.cursor = 'pointer';
             }
         },

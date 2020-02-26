@@ -44,6 +44,8 @@ class Pipe_Careers {
         include_once 'class-pipe-careers-setup.php';
         include_once 'class-pipe-careers-search.php';
         include_once 'class-pipe-careers-settings.php';
+
+        include_once 'components/forms.php';
     }
 
 
