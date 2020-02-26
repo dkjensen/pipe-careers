@@ -189,6 +189,9 @@ class Pipe_Careers_Setup {
         register_taxonomy_for_object_type( 'state', 'landingpage' );
         register_taxonomy_for_object_type( 'trade', 'landingpage' );
         register_taxonomy_for_object_type( 'county', 'landingpage' );
+
+        // Remove support for comments on landing pages
+        remove_post_type_support( 'landingpage', 'comments' );
     }
 
 

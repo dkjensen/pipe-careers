@@ -32,27 +32,31 @@ add_filter( 'the_title', 'pipecareers_forms_title' );
  */
 function pipecareers_forms_content( $content ) {
     if ( get_query_var( 'forms' ) ) {
-        if ( function_exists( 'have_rows' ) && have_rows( 'forms' ) ) {
-            ob_start();
+        if ( function_exists( 'have_rows' ) ) {
+            if ( have_rows( 'forms' ) ) {
+                ob_start();
 
-            while ( have_rows( 'forms' ) ) { the_row(); 
-            ?>
+                while ( have_rows( 'forms' ) ) { the_row(); 
+                ?>
 
-                <h5 style="margin-bottom: 0;"><?php the_sub_field( 'heading' ); ?></h5>
-                <p><a href="<?php the_sub_field( 'file_url' ); ?>" target="_blank" rel="nofollow"><?php the_sub_field( 'file_url' ); ?></a></p>
+                    <h5 style="margin-bottom: 0;"><?php the_sub_field( 'heading' ); ?></h5>
+                    <p><a href="<?php the_sub_field( 'file_url' ); ?>" target="_blank" rel="nofollow"><?php the_sub_field( 'file_url' ); ?></a></p>
 
-                <?php if ( get_sub_field( 'description' ) ) { ?>
+                    <?php if ( get_sub_field( 'description' ) ) { ?>
 
-                <p class="description" style="margin-top: -1em;"><small><?php the_sub_field( 'description' ); ?></small></p>
+                    <p class="description" style="margin-top: -1em;"><small><?php the_sub_field( 'description' ); ?></small></p>
 
-                <hr>
+                    <hr>
 
-                <?php } ?>
+                    <?php } ?>
 
-            <?php
+                <?php
+                }
+
+                return ob_get_clean();
             }
 
-            return ob_get_clean();
+            return '';
         }
     }
 
