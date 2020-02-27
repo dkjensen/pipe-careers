@@ -180,8 +180,7 @@ class Pipe_Careers_Setup {
         $states = get_terms( array( 'taxonomy' => 'state', 'hide_empty' => false ) );
 
         foreach ( $states as $state ) {
-            add_rewrite_rule( $state->slug . '/([0-9]+?)/?$', 'index.php?taxonomy=state&term=' . $state->slug . '&landingpage=$matches[1]', 'top' );
-            add_rewrite_rule( $state->slug . '/([0-9]+?)/forms/?$', 'index.php?taxonomy=state&term=' . $state->slug . '&landingpage=$matches[1]', 'top' );
+            add_rewrite_rule( $state->slug . '/(.+?)(/(.*))?/?$', 'index.php?taxonomy=state&term=' . $state->slug . '&landingpage=$matches[1]&forms=', 'top' );
         }
 
         register_taxonomy_for_object_type( 'post_tag', 'help-article' );
@@ -198,12 +197,18 @@ class Pipe_Careers_Setup {
     public function landingpage_post_link( $post_link, $post ) {
         if ( false !== strpos( $post_link, '%state%' ) ) {
             $state_type_term = get_the_terms( $post->ID, 'state' );
-            $post_link = str_replace( '%state%', array_pop( $state_type_term )->slug, $post_link );
+            
+            $base = $state_type_term ? array_pop( $state_type_term )->slug : 'l';
+
+            $post_link = str_replace( '%state%', $base, $post_link );
         }
 
         if ( get_post_type( $post->ID ) == 'landingpage' ) {
             $state_type_term = get_the_terms( $post->ID, 'state' );
-            $post_link = home_url( array_pop( $state_type_term )->slug . '/' . $post->post_name );
+
+            $base = $state_type_term ? array_pop( $state_type_term )->slug : 'l';
+
+            $post_link = home_url( $base . '/' . $post->post_name );
         }
     
         return $post_link;
