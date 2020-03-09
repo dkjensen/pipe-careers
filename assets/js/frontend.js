@@ -41,13 +41,18 @@
             if ( $map.length ) {
                 map = new mapboxgl.Map( { 
                     container: 'pipe-careers-map', 
-                    style: 'mapbox://styles/mapbox/streets-v11' 
-                } )
+                    style: 'mapbox://styles/mapbox/streets-v11',
+                } );
 
                 if ( typeof center === 'object' ) {
                     map.flyTo( {
                         zoom: 5,
                         center: [ center.longitude, center.latitude ]
+                    } );
+                } else {
+                    map.flyTo( {
+                        zoom: 5,
+                        center: [ -89.6385, 44.2563 ]
                     } );
                 }
                 
