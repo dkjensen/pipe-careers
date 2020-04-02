@@ -179,6 +179,8 @@ class Pipe_Careers_Setup {
 
         $states = get_terms( array( 'taxonomy' => 'state', 'hide_empty' => false ) );
 
+        add_rewrite_rule( '^c19/(.+?)/?$', 'index.php?pagename=c19&page=', 'top' );
+
         foreach ( $states as $state ) {
             add_rewrite_rule( $state->slug . '/(.+?)(/(.*))?/?$', 'index.php?taxonomy=state&term=' . $state->slug . '&landingpage=$matches[1]&forms=', 'top' );
         }
