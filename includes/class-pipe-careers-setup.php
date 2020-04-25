@@ -87,7 +87,7 @@ class Pipe_Careers_Setup {
             'has_archive'        => 'explore',
             'menu_position'      => null,
             'menu_icon'          => 'dashicons-clipboard',
-            'rewrite'            => false,
+            'rewrite'            => true,
             'supports'           => array( 'title', 'editor', 'thumbnail' )
         ) );
 
